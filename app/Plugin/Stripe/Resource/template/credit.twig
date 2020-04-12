@@ -16,8 +16,8 @@
 
                     <!-- ここにエラーメッセージが表示される -->
                     <div id="card-errors" role="alert"></div>
+                    {{ form_widget(form.stripe_token, {type: 'hidden'}) }}
                 </div>
-                <button id="stripe" class="ec-blockBtn--action">クレジットカード情報チェック</button>
             </div>
         </div>
 
@@ -43,7 +43,7 @@
             };
 
             // クレジットカード情報入力欄の構築
-            var card = elements.create('card', {style: style});
+            var card = elements.create('card', {style: style, hidePostalCode: true});
             card.mount('#card-element');
 
             // 入力変更時のリスナー
@@ -57,38 +57,46 @@
                 }
             });
 
-            // submit時のリスナー
-            var button = document.getElementById('stripe');
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
+            window.addEventListener("load", stripeCheckoutHandler, false);
 
-                // Stripeサーバにクレジットカード情報を送信してクレジットカードトークンを取得する
-                stripe.createToken(card).then(function(result) {
-                    if (result.error) {
-                        var errorElement = document.getElementById('card-errors');
-                        errorElement.textContent = result.error.message;
-                    } else {
-                        // クレジットカードトークンをサーバにsubmitする
-                        stripeTokenHandler(result.token);
+            function stripeCheckoutHandler(e) {
+                var selector = '#shopping-form > div > div.ec-orderRole__summary > div > div.ec-totalBox__btn > button';
+                var jsInitCheckTimer = setInterval(jsLoaded, 1000);
+                function jsLoaded() {
+                    if (document.querySelector(selector) != null) {
+                        clearInterval(jsInitCheckTimer);
                     }
-                });
-            });
+                    // submit時のリスナー
+                    var button = document.querySelector(selector);
+                    button.addEventListener('click', function(event) {
+                        event.preventDefault();
+
+                        // Stripeサーバにクレジットカード情報を送信してクレジットカードトークンを取得する
+                        stripe.createToken(card).then(function(result) {
+                            if (result.error) {
+                                var errorElement = document.getElementById('card-errors');
+                                errorElement.textContent = result.error.message;
+                                var overlay = document.querySelector('.bg-load-overlay');
+                                overlay.remove();
+                            } else {
+                                // クレジットカードトークンをサーバにsubmitする
+                                stripeTokenHandler(result.token);
+                                setTimeout(function() {
+                                    var form = document.getElementById('shopping-form');
+                                    form.submit();
+                                }, 1000);
+                            }
+                        });
+                    });
+                }
+            }
 
             function stripeTokenHandler(token) {
                 var form = document.getElementById('shopping-form');
-
-                var stripe_token = document.getElementsByName('{{ form.stripe_token.vars.full_name }}')
+                var stripe_token = document.getElementById('{{ form.stripe_token.vars.id }}');
                 if(stripe_token.length > 0) {
-                    stripe_token.forEach(function (token) {
-                        token.remove();
-                    });
+                    stripe_token.setAttribute('value', token.id);
                 }
-
-                var hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', '{{ form.stripe_token.vars.full_name }}');
-                hiddenInput.setAttribute('value', token.id);
-                form.appendChild(hiddenInput);
             }
         </script>
     </div>
