@@ -10,7 +10,7 @@ gulpconfig.js
 !/app/cache/.gitkeep
 /app/log/*
 !/app/log/.gitkeep
-/app/Plugin/*
+# /app/Plugin/*
 !/app/Plugin/.gitkeep
 !/app/Plugin/ExamplePlugin
 /app/PluginData/*

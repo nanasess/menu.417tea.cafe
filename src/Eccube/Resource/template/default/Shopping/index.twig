@@ -373,6 +373,7 @@ file that was distributed with this source code.
                         </div>
                     </div>
                 {% endif %}
+                {{ include('@Stripe/credit.twig', ignore_missing=true) }}
                 <div class="ec-orderConfirm">
                     <div class="ec-rectHeading">
                         <h2>{{ 'front.shopping.message_info'|trans }}</h2>
