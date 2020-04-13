@@ -9,12 +9,20 @@
             <h2>クレジットカード</h2>
             <div class="ec-input">
                 <script src="https://js.stripe.com/v3/"></script>
-                <div class="form-row">
-                    <div id="card-element">
-                        <!-- ここにクレジットカード情報入力欄が挿入される -->
+                <div class="card">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <div id="card-number" class="form-control"></div>
+                        </div>
                     </div>
-
-                    <!-- ここにエラーメッセージが表示される -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <div id="card-expiration" class="form-control"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <div id="card-cvc" class="form-control"></div>
+                        </div>
+                    </div>
                     <div id="card-errors" role="alert"></div>
                     {{ form_widget(form.stripe_token, {type: 'hidden'}) }}
                 </div>
@@ -34,7 +42,8 @@
                     fontSize: '16px',
                     '::placeholder': {
                         color: '#aab7c4'
-                    }
+                    },
+                    lineHeight: '1.5'
                 },
                 invalid: {
                     color: '#fa755a',
@@ -43,19 +52,35 @@
             };
 
             // クレジットカード情報入力欄の構築
-            var card = elements.create('card', {style: style, hidePostalCode: true});
-            card.mount('#card-element');
+            var card = elements.create('cardNumber', {
+                'placeholder': 'クレジットカード番号',
+                'style': style
+            });
+            card.mount('#card-number');
+            var cvc = elements.create('cardCvc', {
+                'placeholder': 'セキュリティーコード',
+                'style': style
+            });
+            cvc.mount('#card-cvc');
+            var exp = elements.create('cardExpiry', {
+                'placeholder': '有効期限 月/年',
+                'style': style
+            });
+            exp.mount('#card-expiration');
 
             // 入力変更時のリスナー
             // バリデーションメッセージを表示する
-            card.addEventListener('change', function(event) {
-                var displayError = document.getElementById('card-errors');
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
-                }
+            [card, cvc, exp].forEach(function(element, idx) {
+                element.addEventListener('change', function(event) {
+                    var displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
             });
+
 
             window.addEventListener("load", stripeCheckoutHandler, false);
 
@@ -99,6 +124,7 @@
                 }
             }
         </script>
+        <div class="clearfix"></div>
     </div>
 {% else %}
     {{ form_widget(form.stripe_token, {type: 'hidden'}) }}
