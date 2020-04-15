@@ -119,9 +119,7 @@
             function stripeTokenHandler(token) {
                 var form = document.getElementById('shopping-form');
                 var stripe_token = document.getElementById('{{ form.stripe_token.vars.id }}');
-                if(stripe_token.length > 0) {
-                    stripe_token.setAttribute('value', token.id);
-                }
+                stripe_token.setAttribute('value', token.id);
             }
         </script>
         <div class="clearfix"></div>
