@@ -17,6 +17,10 @@ if (!file_exists($autoload) && !is_readable($autoload)) {
 }
 require $autoload;
 
+if (isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Symfony') !== false) {
+    $_SERVER['SERVER_NAME'] = '127.0.0.1';
+}
+
 // The check is to ensure we don't use .env in production
 if (!isset($_SERVER['APP_ENV'])) {
     if (!class_exists(Dotenv::class)) {
