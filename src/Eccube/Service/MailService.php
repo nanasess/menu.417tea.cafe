@@ -350,8 +350,7 @@ class MailService
         $message = (new \Swift_Message())
             ->setSubject('['.$this->BaseInfo->getShopName().'] '.$MailTemplate->getMailSubject())
             ->setFrom([$this->BaseInfo->getEmail01() => $this->BaseInfo->getShopName()])
-            ->setTo([$Order->getEmail()])
-            ->setBcc($this->BaseInfo->getEmail01())
+            ->setTo([$this->BaseInfo->getEmail01()])
             ->setReplyTo($this->BaseInfo->getEmail03())
             ->setReturnPath($this->BaseInfo->getEmail04());
 
