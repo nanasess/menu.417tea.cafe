@@ -13,7 +13,9 @@
 
 namespace Eccube\Controller;
 
+use Eccube\Entity\Customer;
 use Eccube\Entity\CustomerAddress;
+use Eccube\Entity\Master\Pref;
 use Eccube\Entity\Order;
 use Eccube\Entity\Shipping;
 use Eccube\Event\EccubeEvents;
@@ -90,11 +92,11 @@ class ShoppingController extends AbstractShoppingController
     public function index(PurchaseFlow $cartPurchaseFlow)
     {
         // ログイン状態のチェック.
-        if ($this->orderHelper->isLoginRequired()) {
-            log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
+        // if ($this->orderHelper->isLoginRequired()) {
+        //     log_info('[注文手続] 未ログインもしくはRememberMeログインのため, ログイン画面に遷移します.');
 
-            return $this->redirectToRoute('shopping_login');
-        }
+        //     return $this->redirectToRoute('shopping_login');
+        // }
 
         // カートチェック.
         $Cart = $this->cartService->getCart();
@@ -103,10 +105,25 @@ class ShoppingController extends AbstractShoppingController
 
             return $this->redirectToRoute('cart');
         }
+        /** @var Pref $Pref */
+        $Pref = $this->entityManager->find(Pref::class, 27); // Osaka
+        $Customer = new Customer();
+        $Customer
+            ->setName01('2Fの')
+            ->setName02('お客様')
+            ->setEmail(microtime(true).'@417tea.cafe')
+            ->setPhonenumber('00000000000')
+            ->setPostalcode('5560005')
+            ->setPref($Pref)
+            ->setAddr01('大阪市浪速区日本橋')
+            ->setAddr02('4−13−15');
+
+            // 非会員用セッションを作成
+            $this->session->set(OrderHelper::SESSION_NON_MEMBER, $Customer);
+            $this->session->set(OrderHelper::SESSION_NON_MEMBER_ADDRESSES, serialize([]));
 
         // 受注の初期化.
         log_info('[注文手続] 受注の初期化処理を開始します.');
-        $Customer = $this->getUser() ? $this->getUser() : $this->orderHelper->getNonMember();
         $Order = $this->orderHelper->initializeOrder($Cart, $Customer);
 
         // 集計処理.
@@ -134,12 +151,14 @@ class ShoppingController extends AbstractShoppingController
             $this->entityManager->flush();
         }
 
-        $form = $this->createForm(OrderType::class, $Order);
+        return $this->redirectToRoute('shopping_confirm');
 
-        return [
-            'form' => $form->createView(),
-            'Order' => $Order,
-        ];
+        // $form = $this->createForm(OrderType::class, $Order);
+
+        // return [
+        //     'form' => $form->createView(),
+        //     'Order' => $Order,
+        // ];
     }
 
     /**
@@ -234,7 +253,7 @@ class ShoppingController extends AbstractShoppingController
      * PaymentMethod::verifyではクレジットカードの有効性チェック等, 注文手続きを進められるかどうかのチェック処理を行う事を想定しています.
      * PaymentMethod::verifyでエラーが発生した場合は, 注文手続き画面へリダイレクトします.
      *
-     * @Route("/shopping/confirm", name="shopping_confirm", methods={"POST"})
+     * @Route("/shopping/confirm", name="shopping_confirm")
      * @Template("Shopping/confirm.twig")
      */
     public function confirm(Request $request)
