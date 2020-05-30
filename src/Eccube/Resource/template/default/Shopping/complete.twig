@@ -29,14 +29,6 @@ file that was distributed with this source code.
                 <div class="ec-progress__label">{{ 'front.cart.nav__cart_items'|trans }}
                 </div>
             </li>
-            {% if is_granted('ROLE_USER') == false %}
-                <li class="ec-progress__item">
-                    <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
-                    </div>
-                    <div class="ec-progress__label">{{ 'front.cart.nav__customer_info'|trans }}
-                    </div>
-                </li>
-            {% endif %}
             <li class="ec-progress__item">
                 <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
                 </div>
@@ -66,7 +58,7 @@ file that was distributed with this source code.
                 <h2>{{ 'front.shopping.complete_message__title'|trans }}</h2>
             </div>
             <p class="ec-reportDescription">
-                {{ 'front.shopping.complete_message__body'|trans|nl2br }}
+                ただいまお作り致しますので、しばらくお待ちください。
                 {% if Order.id %}
                     <br /><br /><strong>{{ 'front.shopping.order_no'|trans }} : {{ Order.orderNo }}</strong>
                 {% endif %}

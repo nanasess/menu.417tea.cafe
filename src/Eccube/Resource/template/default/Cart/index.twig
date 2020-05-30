@@ -30,14 +30,6 @@ file that was distributed with this source code.
                     <div class="ec-progress__label">{{ 'front.cart.nav__cart_items'|trans }}
                     </div>
                 </li>
-                {% if is_granted('ROLE_USER') == false %}
-                    <li class="ec-progress__item">
-                        <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
-                        </div>
-                        <div class="ec-progress__label">{{ 'front.cart.nav__customer_info'|trans }}
-                        </div>
-                    </li>
-                {% endif %}
                 <li class="ec-progress__item">
                     <div class="ec-progress__number">{{ step }}{% set step = step + 1 %}
                     </div>
@@ -204,7 +196,7 @@ file that was distributed with this source code.
                     <div class="ec-cartRole__actions">
                         <div class="ec-cartRole__total">{{ 'common.total__with_separator'|trans }}<span class="ec-cartRole__totalAmount">{{ Cart.totalPrice|price }}</span>
                         </div>
-                        <a class="ec-blockBtn--action" href="{{ path('cart_buystep', {'cart_key':cartKey}) }}">{{ 'front.cart.checkout'|trans }}</a>
+                        <a class="ec-blockBtn--action" href="{{ path('cart_buystep', {'cart_key':cartKey}) }}">ご注文へ進む</a>
                         {% if loop.last %}
                             <a class="ec-blockBtn--cancel" href="{{ path('homepage') }}">{{ 'front.cart.continue'|trans }}</a>
                         {% endif %}
